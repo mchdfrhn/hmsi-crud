@@ -14,6 +14,15 @@ export interface Task {
   updated_at: string;
 }
 
+export interface TaskAuditLog {
+  id: number;
+  task_id: number;
+  old_status: TaskStatus | null;
+  new_status: TaskStatus;
+  changed_at: string;
+}
+
+
 export interface TaskCreate {
   title: string;
   description?: string | null;

@@ -148,6 +148,7 @@ alembic revision --autogenerate -m "nama_perubahan"
 | **Paginasi Responsif** | Pengaturan nomor halaman, tombol next/prev, dan pemilih limit baris per halaman |
 | **Form Validasi Lengkap** | Validasi sisi klien, mapping error backend (422), dan proteksi anti-double-submission |
 | **Aksi Status Cepat** | Pembaruan status (misal: "Mulai Kerjakan", "Tandai Selesai") dengan 1-klik |
+| **Audit Log Status** | Pencatatan otomatis riwayat transisi status tugas dengan visual timeline aktivitas |
 | **Modal Konfirmasi Hapus** | Dialog peringatan konfirmasi sebelum tugas dihapus secara permanen |
 | **Sistem Toast** | Notifikasi pop-up feedback otomatis untuk setiap aksi Create, Update, dan Delete |
 
@@ -164,6 +165,7 @@ Prefix rute API: `/api/tasks`
 | `GET` | `/api/tasks` | Mengambil daftar tugas (dengan filter & pagination) | `page`, `limit`, `status`, `priority`, `assignee`, `search` |
 | `POST` | `/api/tasks` | Membuat tugas baru | JSON Body (`title`, `description`, `status`, `priority`, `due_date`, `assignee`) |
 | `GET` | `/api/tasks/{id}` | Mengambil detail spesifik satu tugas | Path parameter `id` |
+| `GET` | `/api/tasks/{id}/audit-logs` | Mengambil riwayat audit perubahan status tugas | Path parameter `id` |
 | `PUT` | `/api/tasks/{id}` | Memperbarui data tugas | Path `id`, JSON Body |
 | `DELETE` | `/api/tasks/{id}` | Menghapus tugas | Path parameter `id` |
 

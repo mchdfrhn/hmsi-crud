@@ -4,7 +4,9 @@ from typing import Optional, Tuple, List, Union, Dict, Any
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 from backend.app.models.task import Task, TaskStatus, TaskPriority
+from backend.app.models.audit_log import TaskAuditLog
 from backend.app.schemas.task import TaskCreate, TaskUpdate
+
 
 
 class CRUDTask:
@@ -72,6 +74,14 @@ class CRUDTask:
             due_date=obj_in.due_date,
         )
         db.add(db_obj)
+        db.flush()
+
+        initial_log = TaskAuditLog(
+            task_id=db_obj.id,
+            old_status=None,
+            new_status=db_obj.status,
+        )
+        db.add(initial_log)
         db.commit()
         db.refresh(db_obj)
         return db_obj
@@ -98,18 +108,49 @@ class CRUDTask:
             if new_due < created:
                 raise ValueError("Tenggat waktu (due_date) tidak boleh lebih awal dari tanggal/waktu pembuatan tugas.")
 
+        old_status = db_obj.status
+        status_changed = False
+
+        if "status" in update_data and update_data["status"] is not None:
+            curr_val = old_status.value if hasattr(old_status, "value") else str(old_status)
+            new_val = (
+                update_data["status"].value
+                if hasattr(update_data["status"], "value")
+                else str(update_data["status"])
+            )
+            if curr_val != new_val:
+                status_changed = True
+
         for field in update_data:
             if hasattr(db_obj, field):
                 setattr(db_obj, field, update_data[field])
 
         db.add(db_obj)
+
+        if status_changed:
+            audit_log = TaskAuditLog(
+                task_id=db_obj.id,
+                old_status=old_status,
+                new_status=db_obj.status,
+            )
+            db.add(audit_log)
+
         db.commit()
         db.refresh(db_obj)
         return db_obj
 
+    def get_audit_logs(self, db: Session, task_id: int) -> List[TaskAuditLog]:
+        return (
+            db.query(TaskAuditLog)
+            .filter(TaskAuditLog.task_id == task_id)
+            .order_by(TaskAuditLog.changed_at.desc(), TaskAuditLog.id.desc())
+            .all()
+        )
+
     def delete(self, db: Session, *, db_obj: Task) -> None:
         db.delete(db_obj)
         db.commit()
+
 
     def get_summary(self, db: Session) -> Dict[str, Any]:
         total = db.query(Task).count()

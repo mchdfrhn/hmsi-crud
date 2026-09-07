@@ -1,5 +1,6 @@
 import {
   Task,
+  TaskAuditLog,
   TaskCreate,
   TaskListResponse,
   TaskQueryParams,
@@ -7,6 +8,7 @@ import {
   TaskUpdate,
   ApiValidationErrorDetail,
 } from "@/types/task";
+
 
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000/api";
@@ -137,4 +139,14 @@ export const taskApi = {
       method: "DELETE",
     });
   },
+
+  /**
+   * Mengambil riwayat audit perubahan status tugas
+   */
+  async getTaskAuditLogs(taskId: number): Promise<TaskAuditLog[]> {
+    return request<TaskAuditLog[]>(`/tasks/${taskId}/audit-logs`, {
+      method: "GET",
+    });
+  },
 };
+

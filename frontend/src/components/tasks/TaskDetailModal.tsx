@@ -1,7 +1,8 @@
 "use client";
 
-import React from "react";
-import { Task, TaskStatus } from "@/types/task";
+import React, { useState, useEffect } from "react";
+import { Task, TaskStatus, TaskAuditLog } from "@/types/task";
+import { taskApi } from "@/services/api";
 import { Modal } from "@/components/ui/Modal";
 import { StatusBadge, PriorityBadge, OverdueBadge } from "@/components/ui/Badge";
 import { formatDateTime, isOverdue } from "@/lib/dateUtils";
@@ -11,9 +12,8 @@ import {
   User,
   Edit2,
   Trash2,
-  CheckCircle2,
-  PlayCircle,
-  RotateCcw,
+  History,
+  ArrowRight,
 } from "lucide-react";
 
 interface TaskDetailModalProps {
@@ -33,6 +33,38 @@ export function TaskDetailModal({
   onDelete,
   onQuickStatusChange,
 }: TaskDetailModalProps) {
+  const [logs, setLogs] = useState<TaskAuditLog[]>([]);
+  const [isLoadingLogs, setIsLoadingLogs] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (!isOpen || !task?.id) {
+      setLogs([]);
+      return;
+    }
+
+    let isMounted = true;
+    setIsLoadingLogs(true);
+
+    taskApi
+      .getTaskAuditLogs(task.id)
+      .then((data) => {
+        if (isMounted) {
+          setLogs(data);
+          setIsLoadingLogs(false);
+        }
+      })
+      .catch((err) => {
+        console.error("Gagal mengambil riwayat audit log:", err);
+        if (isMounted) {
+          setIsLoadingLogs(false);
+        }
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [isOpen, task?.id, task?.status]);
+
   if (!task) return null;
 
   const overdue = isOverdue(task.due_date, task.status);
@@ -168,8 +200,85 @@ export function TaskDetailModal({
           </div>
         </div>
 
+        {/* Audit Log / Activity Timeline Section */}
+        <div className="flex flex-col gap-2.5 pt-1 border-t border-slate-100">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-1.5 text-slate-700">
+              <History className="w-4 h-4 text-indigo-600" />
+              <h3 className="text-xs font-bold uppercase tracking-wider">
+                Riwayat Perubahan Status (Audit Log)
+              </h3>
+            </div>
+            {logs.length > 0 && (
+              <span className="text-[11px] font-semibold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full">
+                {logs.length} catatan
+              </span>
+            )}
+          </div>
+
+          <div className="rounded-xl border border-slate-200/80 bg-slate-50/60 p-3.5 max-h-52 overflow-y-auto">
+            {isLoadingLogs ? (
+              <div className="flex flex-col gap-2.5 py-1">
+                {[1, 2].map((i) => (
+                  <div key={i} className="animate-pulse flex items-center gap-3">
+                    <div className="w-2.5 h-2.5 rounded-full bg-slate-300 shrink-0" />
+                    <div className="h-4 bg-slate-200 rounded w-1/3" />
+                    <div className="h-4 bg-slate-200 rounded w-1/4 ml-auto" />
+                  </div>
+                ))}
+              </div>
+            ) : logs.length === 0 ? (
+              <p className="text-xs text-slate-400 italic text-center py-2">
+                Belum ada riwayat perubahan status tercatat.
+              </p>
+            ) : (
+              <div className="relative pl-4 border-l-2 border-slate-200 flex flex-col gap-3 ml-2 my-0.5">
+                {logs.map((log, index) => {
+                  const isInitial = !log.old_status;
+                  return (
+                    <div
+                      key={log.id}
+                      className="relative flex flex-col sm:flex-row sm:items-center justify-between gap-1 sm:gap-2"
+                    >
+                      {/* Timeline Node Marker */}
+                      <div
+                        className={`absolute -left-[22px] top-1 sm:top-auto w-2.5 h-2.5 rounded-full border-2 border-white ring-1 ${
+                          index === 0
+                            ? "bg-indigo-600 ring-indigo-300"
+                            : "bg-slate-400 ring-slate-200"
+                        }`}
+                      />
+
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        {isInitial ? (
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-xs font-semibold text-slate-700">
+                              Status Awal:
+                            </span>
+                            <StatusBadge status={log.new_status} size="sm" />
+                          </div>
+                        ) : (
+                          <div className="flex items-center gap-1.5 flex-wrap">
+                            <StatusBadge status={log.old_status!} size="sm" />
+                            <ArrowRight className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                            <StatusBadge status={log.new_status} size="sm" />
+                          </div>
+                        )}
+                      </div>
+
+                      <span className="text-[11px] font-medium text-slate-500 font-mono shrink-0">
+                        {formatDateTime(log.changed_at)}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        </div>
+
         {/* Bottom Actions: Close, Edit, Delete */}
-        <div className="flex items-center justify-between pt-4 border-t border-slate-100">
+        <div className="flex items-center justify-between pt-3 border-t border-slate-100">
           <button
             onClick={() => {
               onClose();

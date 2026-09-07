@@ -1,9 +1,10 @@
-from typing import Optional
+from typing import Optional, List
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 
 from backend.app.api.deps import get_db
+from backend.app.schemas.audit_log import TaskAuditLogResponse
 from backend.app.schemas.task import (
     TaskCreate,
     TaskListResponse,
@@ -95,6 +96,29 @@ def read_task_by_id(
             detail=f"Tugas dengan ID {id} tidak ditemukan.",
         )
     return task
+
+
+@router.get(
+    "/{id}/audit-logs",
+    response_model=List[TaskAuditLogResponse],
+    summary="Mengambil Riwayat Audit Perubahan Status",
+)
+def read_task_audit_logs(
+    id: int,
+    db: Session = Depends(get_db),
+):
+    """
+    Mengambil riwayat audit perubahan status untuk tugas dengan ID tertentu.
+    Mengembalikan 404 Not Found jika tugas tidak ditemukan.
+    """
+    task = crud_task.get(db=db, task_id=id)
+    if not task:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Tugas dengan ID {id} tidak ditemukan.",
+        )
+    return crud_task.get_audit_logs(db=db, task_id=id)
+
 
 
 @router.put("/{id}", response_model=TaskResponse, summary="Memperbarui Tugas")

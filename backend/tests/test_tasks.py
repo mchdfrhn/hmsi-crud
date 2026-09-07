@@ -171,3 +171,73 @@ def test_tasks_summary(client):
     assert "overdue" in data
     assert "by_status" in data
     assert data["total"] >= 3
+
+
+def test_task_audit_log_flow(client):
+    # 1. Saat tugas dibuat, audit log awal tercatat dengan status awal (old_status=None, new_status="To Do")
+    create_res = client.post("/api/tasks", json={"title": "Implement Audit Log Feature", "status": "To Do"})
+    assert create_res.status_code == status.HTTP_201_CREATED
+    task_id = create_res.json()["id"]
+
+    logs_res = client.get(f"/api/tasks/{task_id}/audit-logs")
+    assert logs_res.status_code == status.HTTP_200_OK
+    logs = logs_res.json()
+    assert len(logs) == 1
+    assert logs[0]["task_id"] == task_id
+    assert logs[0]["old_status"] is None
+    assert logs[0]["new_status"] == "To Do"
+    assert logs[0]["changed_at"] is not None
+
+    # 2. Update field non-status (misal hanya title) TIDAK boleh menambah audit log status
+    put_title_res = client.put(f"/api/tasks/{task_id}", json={"title": "Implement Audit Log Feature (Updated)"})
+    assert put_title_res.status_code == status.HTTP_200_OK
+
+    logs_res2 = client.get(f"/api/tasks/{task_id}/audit-logs")
+    assert logs_res2.status_code == status.HTTP_200_OK
+    assert len(logs_res2.json()) == 1
+
+    # 3. Update status menjadi "In Progress" -> log baru tercatat (To Do -> In Progress)
+    put_status_res1 = client.put(f"/api/tasks/{task_id}", json={"status": "In Progress"})
+    assert put_status_res1.status_code == status.HTTP_200_OK
+
+    logs_res3 = client.get(f"/api/tasks/{task_id}/audit-logs")
+    logs3 = logs_res3.json()
+    assert len(logs3) == 2
+    # Hasil terurut desc (terbaru di depan)
+    assert logs3[0]["old_status"] == "To Do"
+    assert logs3[0]["new_status"] == "In Progress"
+    assert logs3[1]["old_status"] is None
+    assert logs3[1]["new_status"] == "To Do"
+
+    # 4. Update status menjadi "Done" -> log ketiga tercatat (In Progress -> Done)
+    put_status_res2 = client.put(f"/api/tasks/{task_id}", json={"status": "Done"})
+    assert put_status_res2.status_code == status.HTTP_200_OK
+
+    logs_res4 = client.get(f"/api/tasks/{task_id}/audit-logs")
+    logs4 = logs_res4.json()
+    assert len(logs4) == 3
+    assert logs4[0]["old_status"] == "In Progress"
+    assert logs4[0]["new_status"] == "Done"
+
+    # 5. Endpoint audit logs mengembalikan 404 untuk task yang tidak ada
+    not_found_res = client.get("/api/tasks/999999/audit-logs")
+    assert not_found_res.status_code == status.HTTP_404_NOT_FOUND
+
+
+def test_task_audit_log_cascade_delete(client):
+    # Buat task dengan beberapa perubahan status
+    res = client.post("/api/tasks", json={"title": "Task for Cascade Testing"})
+    task_id = res.json()["id"]
+    client.put(f"/api/tasks/{task_id}", json={"status": "In Progress"})
+
+    # Pastikan log ada
+    logs_res = client.get(f"/api/tasks/{task_id}/audit-logs")
+    assert len(logs_res.json()) == 2
+
+    # Hapus task
+    del_res = client.delete(f"/api/tasks/{task_id}")
+    assert del_res.status_code == status.HTTP_200_OK
+
+    # Query audit logs harus 404 karena task telah terhapus
+    assert client.get(f"/api/tasks/{task_id}/audit-logs").status_code == status.HTTP_404_NOT_FOUND
+

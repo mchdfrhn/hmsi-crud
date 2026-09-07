@@ -1,5 +1,6 @@
 import enum
 from sqlalchemy import Column, Integer, String, Text, DateTime, Enum as SQLEnum
+from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from backend.app.core.database import Base
 
@@ -49,3 +50,11 @@ class Task(Base):
         server_default=func.now(),
         onupdate=func.now(),
     )
+
+    audit_logs = relationship(
+        "TaskAuditLog",
+        back_populates="task",
+        cascade="all, delete-orphan",
+        order_by="desc(TaskAuditLog.changed_at)",
+    )
+
