@@ -24,21 +24,21 @@ export function Pagination({
   const endItem = Math.min(page * limit, total);
 
   return (
-    <div className="flex flex-col sm:flex-row items-center justify-between gap-3 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs text-xs text-slate-500 dark:text-slate-400">
+    <div className="flex flex-col sm:flex-row items-center justify-between gap-3 p-4 rounded-2xl border border-slate-200 bg-white shadow-xs text-xs text-slate-600 font-medium">
       {/* Items Range & Limit Selector */}
       <div className="flex items-center gap-3">
         <span>
-          Menampilkan <span className="font-semibold text-slate-800 dark:text-slate-200">{startItem}</span>-
-          <span className="font-semibold text-slate-800 dark:text-slate-200">{endItem}</span> dari{" "}
-          <span className="font-semibold text-slate-800 dark:text-slate-200">{total}</span> tugas
+          Menampilkan <span className="font-bold text-slate-900">{startItem}</span>-
+          <span className="font-bold text-slate-900">{endItem}</span> dari{" "}
+          <span className="font-bold text-slate-900">{total}</span> tugas
         </span>
 
-        <div className="flex items-center gap-1.5 ml-2 border-l border-slate-200 dark:border-slate-800 pl-3">
+        <div className="flex items-center gap-1.5 ml-2 border-l border-slate-200 pl-3">
           <span>Baris:</span>
           <select
             value={limit}
             onChange={(e) => onLimitChange(Number(e.target.value))}
-            className="text-xs font-medium px-2 py-1 rounded-md border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-200 focus:ring-1 focus:ring-indigo-500"
+            className="text-xs font-semibold px-2 py-1 rounded-md border border-slate-200 bg-white text-slate-800 focus:outline-hidden focus:ring-1 focus:ring-indigo-500 shadow-xs"
           >
             <option value={5}>5</option>
             <option value={10}>10</option>
@@ -53,7 +53,7 @@ export function Pagination({
         <button
           onClick={() => onPageChange(page - 1)}
           disabled={page <= 1}
-          className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+          className="p-1.5 rounded-lg border border-slate-200 text-slate-700 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
           title="Halaman Sebelumnya"
           aria-label="Previous page"
         >
@@ -76,10 +76,10 @@ export function Pagination({
                   {showEllipsis && <span className="px-1 text-slate-400">...</span>}
                   <button
                     onClick={() => onPageChange(p)}
-                    className={`min-w-7 h-7 px-2 rounded-lg text-xs font-medium transition-all ${
+                    className={`min-w-7 h-7 px-2 rounded-lg text-xs font-bold transition-all ${
                       p === page
                         ? "bg-indigo-600 text-white shadow-xs"
-                        : "text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
+                        : "text-slate-700 hover:bg-slate-100 border border-slate-200"
                     }`}
                   >
                     {p}
@@ -92,7 +92,7 @@ export function Pagination({
         <button
           onClick={() => onPageChange(page + 1)}
           disabled={page >= totalPages}
-          className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+          className="p-1.5 rounded-lg border border-slate-200 text-slate-700 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
           title="Halaman Selanjutnya"
           aria-label="Next page"
         >

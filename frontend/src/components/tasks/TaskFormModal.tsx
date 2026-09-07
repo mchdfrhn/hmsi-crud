@@ -77,7 +77,7 @@ export function TaskFormModal({
     if (!isEditing && dueDate) {
       const selected = new Date(dueDate);
       const now = new Date();
-      // Berikan toleransi 1 menit
+      // Berikan toleransi 60 detik
       if (selected.getTime() < now.getTime() - 60000) {
         newErrors.due_date = "Tenggat waktu tidak boleh lebih awal dari waktu saat ini.";
       }
@@ -142,9 +142,9 @@ export function TaskFormModal({
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         {/* General Error Banner */}
         {generalError && (
-          <div className="flex items-start gap-2 p-3.5 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900 text-rose-700 dark:text-rose-300 text-xs">
-            <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
-            <div className="flex-1 font-medium">{generalError}</div>
+          <div className="flex items-start gap-2 p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs">
+            <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-rose-600" />
+            <div className="flex-1 font-semibold">{generalError}</div>
           </div>
         )}
 
@@ -153,14 +153,14 @@ export function TaskFormModal({
           <div className="flex justify-between items-center mb-1">
             <label
               htmlFor="task-title"
-              className="text-xs font-semibold text-slate-700 dark:text-slate-300"
+              className="text-xs font-bold text-slate-800"
             >
               Judul Tugas <span className="text-rose-500">*</span>
             </label>
             <span
               className={`text-xs ${
                 title.length > 100
-                  ? "text-rose-500 font-bold"
+                  ? "text-rose-600 font-bold"
                   : "text-slate-400"
               }`}
             >
@@ -177,14 +177,14 @@ export function TaskFormModal({
             }}
             placeholder="Contoh: Implementasi integrasi API FastAPI"
             maxLength={100}
-            className={`w-full px-3.5 py-2.5 text-sm rounded-xl border bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-hidden focus:ring-2 transition-all ${
+            className={`w-full px-3.5 py-2.5 text-sm rounded-xl border bg-white text-slate-900 placeholder-slate-400 focus:outline-hidden focus:ring-2 transition-all shadow-xs ${
               errors.title
-                ? "border-rose-500 focus:ring-rose-500/20"
-                : "border-slate-200 dark:border-slate-800 focus:border-indigo-500 focus:ring-indigo-500/20"
+                ? "border-rose-400 focus:ring-rose-500/20"
+                : "border-slate-300 focus:border-indigo-600 focus:ring-indigo-500/20"
             }`}
           />
           {errors.title && (
-            <p className="mt-1 text-xs text-rose-500 font-medium">{errors.title}</p>
+            <p className="mt-1 text-xs text-rose-600 font-semibold">{errors.title}</p>
           )}
         </div>
 
@@ -192,7 +192,7 @@ export function TaskFormModal({
         <div>
           <label
             htmlFor="task-description"
-            className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1"
+            className="block text-xs font-bold text-slate-800 mb-1"
           >
             Deskripsi (Opsional)
           </label>
@@ -202,7 +202,7 @@ export function TaskFormModal({
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             placeholder="Jelaskan detail kebutuhan tugas ini..."
-            className="w-full px-3.5 py-2 text-sm rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all resize-none"
+            className="w-full px-3.5 py-2 text-sm rounded-xl border border-slate-300 bg-white text-slate-900 placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 transition-all resize-none shadow-xs"
           />
         </div>
 
@@ -212,7 +212,7 @@ export function TaskFormModal({
           <div>
             <label
               htmlFor="task-status"
-              className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1"
+              className="block text-xs font-bold text-slate-800 mb-1"
             >
               Status
             </label>
@@ -220,7 +220,7 @@ export function TaskFormModal({
               id="task-status"
               value={status}
               onChange={(e) => setStatus(e.target.value as TaskStatus)}
-              className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white focus:outline-hidden focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+              className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-slate-300 bg-white text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 shadow-xs font-medium"
             >
               <option value="To Do">To Do</option>
               <option value="In Progress">In Progress</option>
@@ -232,7 +232,7 @@ export function TaskFormModal({
           <div>
             <label
               htmlFor="task-priority"
-              className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1"
+              className="block text-xs font-bold text-slate-800 mb-1"
             >
               Prioritas
             </label>
@@ -240,7 +240,7 @@ export function TaskFormModal({
               id="task-priority"
               value={priority}
               onChange={(e) => setPriority(e.target.value as TaskPriority)}
-              className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white focus:outline-hidden focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+              className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-slate-300 bg-white text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 shadow-xs font-medium"
             >
               <option value="Low">Low</option>
               <option value="Medium">Medium</option>
@@ -255,7 +255,7 @@ export function TaskFormModal({
           <div>
             <label
               htmlFor="task-assignee"
-              className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1"
+              className="block text-xs font-bold text-slate-800 mb-1"
             >
               Penanggung Jawab (Assignee)
             </label>
@@ -269,14 +269,14 @@ export function TaskFormModal({
               }}
               placeholder="Contoh: Budi Santoso"
               maxLength={100}
-              className={`w-full px-3.5 py-2.5 text-sm rounded-xl border bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-hidden focus:ring-2 transition-all ${
+              className={`w-full px-3.5 py-2.5 text-sm rounded-xl border bg-white text-slate-900 placeholder-slate-400 focus:outline-hidden focus:ring-2 transition-all shadow-xs ${
                 errors.assignee
-                  ? "border-rose-500 focus:ring-rose-500/20"
-                  : "border-slate-200 dark:border-slate-800 focus:border-indigo-500 focus:ring-indigo-500/20"
+                  ? "border-rose-400 focus:ring-rose-500/20"
+                  : "border-slate-300 focus:border-indigo-600 focus:ring-indigo-500/20"
               }`}
             />
             {errors.assignee && (
-              <p className="mt-1 text-xs text-rose-500 font-medium">{errors.assignee}</p>
+              <p className="mt-1 text-xs text-rose-600 font-semibold">{errors.assignee}</p>
             )}
           </div>
 
@@ -284,7 +284,7 @@ export function TaskFormModal({
           <div>
             <label
               htmlFor="task-due-date"
-              className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1"
+              className="block text-xs font-bold text-slate-800 mb-1"
             >
               Tenggat Waktu (Due Date)
             </label>
@@ -296,32 +296,32 @@ export function TaskFormModal({
                 setDueDate(e.target.value);
                 if (errors.due_date) setErrors((prev) => ({ ...prev, due_date: "" }));
               }}
-              className={`w-full px-3.5 py-2.5 text-sm rounded-xl border bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-hidden focus:ring-2 transition-all ${
+              className={`w-full px-3.5 py-2.5 text-sm rounded-xl border bg-white text-slate-900 placeholder-slate-400 focus:outline-hidden focus:ring-2 transition-all shadow-xs ${
                 errors.due_date
-                  ? "border-rose-500 focus:ring-rose-500/20"
-                  : "border-slate-200 dark:border-slate-800 focus:border-indigo-500 focus:ring-indigo-500/20"
+                  ? "border-rose-400 focus:ring-rose-500/20"
+                  : "border-slate-300 focus:border-indigo-600 focus:ring-indigo-500/20"
               }`}
             />
             {errors.due_date && (
-              <p className="mt-1 text-xs text-rose-500 font-medium">{errors.due_date}</p>
+              <p className="mt-1 text-xs text-rose-600 font-semibold">{errors.due_date}</p>
             )}
           </div>
         </div>
 
         {/* Form Actions (Submit & Cancel) */}
-        <div className="flex items-center justify-end gap-3 mt-4 pt-4 border-t border-slate-100 dark:border-slate-800">
+        <div className="flex items-center justify-end gap-3 mt-4 pt-4 border-t border-slate-100">
           <button
             type="button"
             onClick={onClose}
             disabled={isSubmitting}
-            className="px-4 py-2 text-sm font-medium rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors disabled:opacity-50"
+            className="px-4 py-2 text-sm font-semibold rounded-xl text-slate-700 hover:bg-slate-100 border border-slate-200 transition-colors disabled:opacity-50"
           >
             Batal
           </button>
           <button
             type="submit"
             disabled={isSubmitting}
-            className="inline-flex items-center gap-2 px-5 py-2 text-sm font-medium rounded-xl text-white bg-indigo-600 hover:bg-indigo-500 shadow-sm shadow-indigo-500/20 transition-all active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed"
+            className="inline-flex items-center gap-2 px-5 py-2 text-sm font-semibold rounded-xl text-white bg-indigo-600 hover:bg-indigo-700 shadow-xs transition-all active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed"
           >
             {isSubmitting && <Loader2 className="w-4 h-4 animate-spin" />}
             <span>{isSubmitting ? "Menyimpan..." : isEditing ? "Simpan Perubahan" : "Buat Tugas"}</span>

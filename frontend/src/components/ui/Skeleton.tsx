@@ -3,7 +3,7 @@ import React from "react";
 export function Skeleton({ className = "" }: { className?: string }) {
   return (
     <div
-      className={`animate-pulse rounded-md bg-slate-200 dark:bg-slate-800 ${className}`}
+      className={`animate-pulse rounded-md bg-slate-100 ${className}`}
     />
   );
 }
@@ -14,7 +14,7 @@ export function SummaryCardSkeleton() {
       {[1, 2, 3, 4, 5].map((i) => (
         <div
           key={i}
-          className="p-5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm flex flex-col gap-3"
+          className="p-5 rounded-2xl border border-slate-200 bg-white shadow-xs flex flex-col gap-3"
         >
           <div className="flex items-center justify-between">
             <Skeleton className="h-4 w-20" />
@@ -32,7 +32,7 @@ export function TableRowSkeleton({ count = 5 }: { count?: number }) {
   return (
     <>
       {Array.from({ length: count }).map((_, i) => (
-        <tr key={i} className="border-b border-slate-100 dark:border-slate-800/60">
+        <tr key={i} className="border-b border-slate-100">
           <td className="p-4">
             <Skeleton className="h-4 w-40 mb-1.5" />
             <Skeleton className="h-3 w-56" />
@@ -68,7 +68,7 @@ export function GridCardSkeleton({ count = 6 }: { count?: number }) {
       {Array.from({ length: count }).map((_, i) => (
         <div
           key={i}
-          className="p-5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm flex flex-col gap-4"
+          className="p-5 rounded-2xl border border-slate-200 bg-white shadow-xs flex flex-col gap-4"
         >
           <div className="flex items-center justify-between">
             <Skeleton className="h-5 w-20 rounded-full" />
@@ -79,7 +79,7 @@ export function GridCardSkeleton({ count = 6 }: { count?: number }) {
             <Skeleton className="h-3 w-full mb-1" />
             <Skeleton className="h-3 w-2/3" />
           </div>
-          <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex justify-between items-center">
+          <div className="pt-3 border-t border-slate-100 flex justify-between items-center">
             <Skeleton className="h-4 w-24" />
             <Skeleton className="h-4 w-20" />
           </div>

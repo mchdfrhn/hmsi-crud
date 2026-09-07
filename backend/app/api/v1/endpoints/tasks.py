@@ -91,39 +91,14 @@ def read_task_by_id(
     return task
 
 
-@router.put("/{id}", response_model=TaskResponse, summary="Memperbarui Tugas (Full Update)")
-def update_task_put(
+@router.put("/{id}", response_model=TaskResponse, summary="Memperbarui Tugas")
+def update_task(
     id: int,
     task_in: TaskUpdate,
     db: Session = Depends(get_db),
 ):
     """
-    Memperbarui data tugas yang sudah ada secara keseluruhan.
-    """
-    task = crud_task.get(db=db, task_id=id)
-    if not task:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Tugas dengan ID {id} tidak ditemukan.",
-        )
-    try:
-        updated_task = crud_task.update(db=db, db_obj=task, obj_in=task_in)
-    except ValueError as err:
-        raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail=str(err),
-        )
-    return updated_task
-
-
-@router.patch("/{id}", response_model=TaskResponse, summary="Memperbarui Sebagian Tugas (Partial Update)")
-def update_task_patch(
-    id: int,
-    task_in: TaskUpdate,
-    db: Session = Depends(get_db),
-):
-    """
-    Memperbarui sebagian atribut data tugas yang sudah ada.
+    Memperbarui data tugas yang sudah ada.
     """
     task = crud_task.get(db=db, task_id=id)
     if not task:

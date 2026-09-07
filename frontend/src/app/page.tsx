@@ -14,7 +14,7 @@ import { TaskDetailModal } from "@/components/tasks/TaskDetailModal";
 import { DeleteConfirmModal } from "@/components/tasks/DeleteConfirmModal";
 import { SummaryCardSkeleton, TableRowSkeleton, GridCardSkeleton } from "@/components/ui/Skeleton";
 import { EmptyState } from "@/components/ui/EmptyState";
-import { CheckSquare, RefreshCw, AlertCircle } from "lucide-react";
+import { CheckSquare, RefreshCw, AlertCircle, Sparkles } from "lucide-react";
 
 export default function HomePage() {
   const {
@@ -95,29 +95,34 @@ export default function HomePage() {
     Boolean(assignee);
 
   return (
-    <div className="min-h-screen bg-slate-50/50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col">
+    <div className="min-h-screen bg-[#f8fafc] text-slate-900 flex flex-col">
       {/* Top Navigation Bar */}
-      <header className="sticky top-0 z-30 border-b border-slate-200/80 dark:border-slate-800/80 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md">
+      <header className="sticky top-0 z-30 border-b border-slate-200/80 bg-white/95 backdrop-blur-sm shadow-xs">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-indigo-600 text-white flex items-center justify-center shadow-md shadow-indigo-600/20">
+            <div className="w-9 h-9 rounded-xl bg-indigo-600 text-white flex items-center justify-center shadow-sm shadow-indigo-600/20">
               <CheckSquare className="w-5 h-5" />
             </div>
             <div>
-              <h1 className="text-base font-bold text-slate-900 dark:text-white leading-none">
-                Antigravity Tasks
-              </h1>
-              <span className="text-xs text-slate-400">
-                HMSI Technical Test
+              <div className="flex items-center gap-2">
+                <h1 className="text-base font-bold text-slate-900 leading-none tracking-tight">
+                  Antigravity Tasks
+                </h1>
+                <span className="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-indigo-50 text-indigo-700 border border-indigo-100 text-[10px] font-semibold">
+                  <Sparkles className="w-2.5 h-2.5" /> Pro
+                </span>
+              </div>
+              <span className="text-xs text-slate-500 font-medium">
+                Task Management System &bull; HMSI Technical Test
               </span>
             </div>
           </div>
 
           <div className="flex items-center gap-3">
             {/* Backend Status Indicator */}
-            <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300 text-xs font-medium">
+            <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-50 border border-emerald-200/70 text-emerald-700 text-xs font-medium">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              <span>FastAPI Backend Connected</span>
+              <span>FastAPI Backend Active</span>
             </div>
 
             {/* Refresh Button */}
@@ -126,10 +131,10 @@ export default function HomePage() {
                 refreshTasks();
                 refreshSummary();
               }}
-              className="p-2 rounded-xl border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+              className="p-2 rounded-xl border border-slate-200 text-slate-600 hover:text-slate-900 hover:bg-slate-50 hover:border-slate-300 transition-all shadow-xs"
               title="Perbarui Data"
             >
-              <RefreshCw className={`w-4 h-4 ${isLoading ? "animate-spin" : ""}`} />
+              <RefreshCw className={`w-4 h-4 ${isLoading ? "animate-spin text-indigo-600" : ""}`} />
             </button>
           </div>
         </div>
@@ -140,12 +145,14 @@ export default function HomePage() {
         {/* Dashboard Overview Section */}
         <section className="flex flex-col gap-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-bold text-slate-900 dark:text-white tracking-tight">
-              Ringkasan Dasbor
-            </h2>
-            <span className="text-xs text-slate-500 dark:text-slate-400">
-              Agregasi metrik tugas real-time
-            </span>
+            <div>
+              <h2 className="text-lg font-bold text-slate-900 tracking-tight">
+                Ringkasan Dasbor
+              </h2>
+              <p className="text-xs text-slate-500">
+                Statistik metrik dan progres pengerjaan tugas secara real-time
+              </p>
+            </div>
           </div>
 
           {isSummaryLoading && !summary ? (
@@ -166,11 +173,11 @@ export default function HomePage() {
         <section className="flex flex-col gap-4 mt-2">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-lg font-bold text-slate-900 dark:text-white tracking-tight">
+              <h2 className="text-lg font-bold text-slate-900 tracking-tight">
                 Daftar Tugas
               </h2>
-              <p className="text-xs text-slate-500 dark:text-slate-400">
-                Kelola, saring, dan perbarui tugas proyek Anda
+              <p className="text-xs text-slate-500">
+                Kelola, cari, saring, dan perbarui tugas-tugas proyek Anda
               </p>
             </div>
           </div>
@@ -194,14 +201,14 @@ export default function HomePage() {
 
           {/* Error Banner */}
           {error && (
-            <div className="p-4 rounded-2xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900 text-rose-700 dark:text-rose-300 text-sm flex items-center justify-between">
+            <div className="p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 text-sm flex items-center justify-between shadow-xs">
               <div className="flex items-center gap-2">
-                <AlertCircle className="w-5 h-5 shrink-0" />
-                <span>{error}</span>
+                <AlertCircle className="w-5 h-5 shrink-0 text-rose-600" />
+                <span className="font-medium">{error}</span>
               </div>
               <button
                 onClick={() => refreshTasks()}
-                className="px-3 py-1 rounded-lg bg-rose-200 dark:bg-rose-900 font-medium text-xs hover:bg-rose-300 transition-colors"
+                className="px-3 py-1 rounded-lg bg-rose-100 font-semibold text-xs text-rose-800 hover:bg-rose-200 transition-colors"
               >
                 Coba Lagi
               </button>
@@ -211,9 +218,9 @@ export default function HomePage() {
           {/* Loading Skeletons */}
           {isLoading ? (
             viewMode === "table" ? (
-              <div className="overflow-x-auto rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs">
+              <div className="overflow-x-auto rounded-2xl border border-slate-200/90 bg-white shadow-xs">
                 <table className="w-full text-left text-sm">
-                  <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                  <tbody className="divide-y divide-slate-100">
                     <TableRowSkeleton count={limit > 5 ? 5 : limit} />
                   </tbody>
                 </table>
@@ -263,8 +270,8 @@ export default function HomePage() {
         </section>
       </main>
 
-      {/* Footer */}
-      <footer className="border-t border-slate-200 dark:border-slate-800 py-6 text-center text-xs text-slate-400">
+      {/* Clean White Footer */}
+      <footer className="border-t border-slate-200 bg-white py-6 text-center text-xs text-slate-500">
         Task Management System &bull; Technical Test HMSI &bull; Next.js 16 + FastAPI
       </footer>
 

@@ -113,14 +113,14 @@ def test_read_task_by_id_success_and_not_found(client):
     assert "tidak ditemukan" in res.json()["detail"]
 
 
-def test_update_task_put_and_patch(client):
+def test_update_task_put(client):
     res = client.post("/api/tasks", json={"title": "Initial Task Title", "priority": "Low"})
     task_id = res.json()["id"]
 
-    # PATCH status to In Progress
-    patch_res = client.patch(f"/api/tasks/{task_id}", json={"status": "In Progress"})
-    assert patch_res.status_code == status.HTTP_200_OK
-    assert patch_res.json()["status"] == "In Progress"
+    # PUT update status to In Progress
+    put_status_res = client.put(f"/api/tasks/{task_id}", json={"status": "In Progress"})
+    assert put_status_res.status_code == status.HTTP_200_OK
+    assert put_status_res.json()["status"] == "In Progress"
 
     # PUT update title and priority
     future_due = (datetime.now(timezone.utc) + timedelta(days=5)).isoformat()
@@ -133,7 +133,7 @@ def test_update_task_put_and_patch(client):
     assert put_res.json()["priority"] == "High"
 
     # Update 404
-    res_404 = client.patch("/api/tasks/999999", json={"title": "Ghost"})
+    res_404 = client.put("/api/tasks/999999", json={"title": "Ghost"})
     assert res_404.status_code == status.HTTP_404_NOT_FOUND
 
 

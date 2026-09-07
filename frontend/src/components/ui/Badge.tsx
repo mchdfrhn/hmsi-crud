@@ -1,6 +1,6 @@
 import React from "react";
 import { TaskPriority, TaskStatus } from "@/types/task";
-import { Clock, CheckCircle, AlertTriangle, Flame, ShieldAlert, Sparkles } from "lucide-react";
+import { Clock, CheckCircle, Flame, AlertTriangle, Sparkles, AlertOctagon } from "lucide-react";
 
 interface StatusBadgeProps {
   status: TaskStatus;
@@ -8,14 +8,14 @@ interface StatusBadgeProps {
 }
 
 export function StatusBadge({ status, size = "md" }: StatusBadgeProps) {
-  const sizeClasses = size === "sm" ? "px-2 py-0.5 text-xs" : "px-2.5 py-1 text-xs font-medium";
+  const sizeClasses = size === "sm" ? "px-2 py-0.5 text-xs" : "px-2.5 py-1 text-xs font-semibold";
 
   if (status === "Done") {
     return (
       <span
-        className={`inline-flex items-center gap-1.5 rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 ${sizeClasses}`}
+        className={`inline-flex items-center gap-1.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200/80 ${sizeClasses}`}
       >
-        <CheckCircle className="w-3.5 h-3.5" />
+        <CheckCircle className="w-3.5 h-3.5 text-emerald-600" />
         Done
       </span>
     );
@@ -24,9 +24,9 @@ export function StatusBadge({ status, size = "md" }: StatusBadgeProps) {
   if (status === "In Progress") {
     return (
       <span
-        className={`inline-flex items-center gap-1.5 rounded-full bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/20 ${sizeClasses}`}
+        className={`inline-flex items-center gap-1.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200/80 ${sizeClasses}`}
       >
-        <Clock className="w-3.5 h-3.5 animate-pulse" />
+        <Clock className="w-3.5 h-3.5 text-amber-600 animate-pulse" />
         In Progress
       </span>
     );
@@ -35,7 +35,7 @@ export function StatusBadge({ status, size = "md" }: StatusBadgeProps) {
   // To Do
   return (
     <span
-      className={`inline-flex items-center gap-1.5 rounded-full bg-blue-500/15 text-blue-600 dark:text-blue-400 border border-blue-500/20 ${sizeClasses}`}
+      className={`inline-flex items-center gap-1.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200/80 ${sizeClasses}`}
     >
       <span className="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
       To Do
@@ -49,14 +49,14 @@ interface PriorityBadgeProps {
 }
 
 export function PriorityBadge({ priority, size = "md" }: PriorityBadgeProps) {
-  const sizeClasses = size === "sm" ? "px-2 py-0.5 text-xs" : "px-2.5 py-1 text-xs font-medium";
+  const sizeClasses = size === "sm" ? "px-2 py-0.5 text-xs" : "px-2.5 py-1 text-xs font-semibold";
 
   if (priority === "High") {
     return (
       <span
-        className={`inline-flex items-center gap-1 rounded-full bg-rose-500/15 text-rose-600 dark:text-rose-400 border border-rose-500/20 ${sizeClasses}`}
+        className={`inline-flex items-center gap-1 rounded-full bg-rose-50 text-rose-700 border border-rose-200/80 ${sizeClasses}`}
       >
-        <Flame className="w-3.5 h-3.5" />
+        <Flame className="w-3.5 h-3.5 text-rose-600" />
         High
       </span>
     );
@@ -65,9 +65,9 @@ export function PriorityBadge({ priority, size = "md" }: PriorityBadgeProps) {
   if (priority === "Medium") {
     return (
       <span
-        className={`inline-flex items-center gap-1 rounded-full bg-orange-500/15 text-orange-600 dark:text-orange-400 border border-orange-500/20 ${sizeClasses}`}
+        className={`inline-flex items-center gap-1 rounded-full bg-orange-50 text-orange-700 border border-orange-200/80 ${sizeClasses}`}
       >
-        <AlertTriangle className="w-3.5 h-3.5" />
+        <AlertTriangle className="w-3.5 h-3.5 text-orange-600" />
         Medium
       </span>
     );
@@ -76,9 +76,9 @@ export function PriorityBadge({ priority, size = "md" }: PriorityBadgeProps) {
   // Low
   return (
     <span
-      className={`inline-flex items-center gap-1 rounded-full bg-slate-500/15 text-slate-600 dark:text-slate-400 border border-slate-500/20 ${sizeClasses}`}
+      className={`inline-flex items-center gap-1 rounded-full bg-slate-100 text-slate-700 border border-slate-200 ${sizeClasses}`}
     >
-      <Sparkles className="w-3.5 h-3.5" />
+      <Sparkles className="w-3.5 h-3.5 text-slate-500" />
       Low
     </span>
   );
@@ -86,8 +86,8 @@ export function PriorityBadge({ priority, size = "md" }: PriorityBadgeProps) {
 
 export function OverdueBadge() {
   return (
-    <span className="inline-flex items-center gap-1 rounded-full bg-red-500/15 text-red-600 dark:text-red-400 border border-red-500/30 px-2 py-0.5 text-xs font-semibold">
-      <ShieldAlert className="w-3.5 h-3.5 text-red-500" />
+    <span className="inline-flex items-center gap-1 rounded-full bg-rose-50 text-rose-700 border border-rose-200 px-2 py-0.5 text-xs font-bold">
+      <AlertOctagon className="w-3 h-3 text-rose-600" />
       Overdue
     </span>
   );
