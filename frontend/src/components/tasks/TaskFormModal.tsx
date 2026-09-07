@@ -163,7 +163,7 @@ export function TaskFormModal({
       title={isEditing ? `Edit Tugas: #${taskToEdit?.id}` : "Buat Tugas Baru"}
       maxWidth="lg"
     >
-      <form onSubmit={handleSubmit} onKeyDown={handleKeyDown} className="flex flex-col gap-4">
+      <form onSubmit={handleSubmit} onKeyDown={handleKeyDown} noValidate className="flex flex-col gap-4">
         {/* General Error Banner */}
         {generalError && (
           <div className="flex items-start gap-2 p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs">
