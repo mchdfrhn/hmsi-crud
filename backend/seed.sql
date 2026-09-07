@@ -1,7 +1,37 @@
--- ==========================================================
--- Dummy Data Seed Script for Task Management System (PostgreSQL)
--- ==========================================================
+-- 1. Create Enums if not exist
+DO $$ BEGIN
+  CREATE TYPE task_status AS ENUM ('To Do', 'In Progress', 'Done');
+EXCEPTION
+  WHEN duplicate_object THEN null;
+END $$;
 
+DO $$ BEGIN
+  CREATE TYPE task_priority AS ENUM ('Low', 'Medium', 'High');
+EXCEPTION
+  WHEN duplicate_object THEN null;
+END $$;
+
+-- 2. Create tasks table if not exists
+CREATE TABLE IF NOT EXISTS tasks (
+  id SERIAL PRIMARY KEY,
+  title VARCHAR(100) NOT NULL,
+  description TEXT,
+  status task_status NOT NULL DEFAULT 'To Do',
+  priority task_priority NOT NULL DEFAULT 'Medium',
+  assignee VARCHAR(100),
+  due_date TIMESTAMPTZ,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- 3. Create indexes
+CREATE INDEX IF NOT EXISTS ix_tasks_id ON tasks (id);
+CREATE INDEX IF NOT EXISTS ix_tasks_title ON tasks (title);
+CREATE INDEX IF NOT EXISTS ix_tasks_status ON tasks (status);
+CREATE INDEX IF NOT EXISTS ix_tasks_priority ON tasks (priority);
+CREATE INDEX IF NOT EXISTS ix_tasks_assignee ON tasks (assignee);
+
+-- 4. Insert Dummy Data
 INSERT INTO tasks (title, description, status, priority, assignee, due_date, created_at, updated_at)
 VALUES
   -- 1. To Do - High Priority (Upcoming)

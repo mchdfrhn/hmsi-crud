@@ -114,6 +114,29 @@ npm test
 
 ---
 
+## 🗄️ Database Migration (Alembic)
+
+Skema basis data dikelola, dimigrasikan, dan dilacak versinya secara terstruktur menggunakan **Alembic**.
+
+```bash
+# Menjalankan migrasi ke versi skema terbaru (head)
+alembic upgrade head
+
+# Melihat versi migrasi yang aktif saat ini
+alembic current
+
+# Melihat seluruh riwayat migrasi yang tersedia
+alembic history -v
+
+# Membatalkan migrasi mundur 1 langkah (rollback)
+alembic downgrade -1
+
+# Membuat revisi migrasi baru secara otomatis
+alembic revision --autogenerate -m "nama_perubahan"
+```
+
+---
+
 ## 🌟 Fitur Unggulan Sistem
 
 | Fitur | Deskripsi |
@@ -141,8 +164,7 @@ Prefix rute API: `/api/tasks`
 | `GET` | `/api/tasks` | Mengambil daftar tugas (dengan filter & pagination) | `page`, `limit`, `status`, `priority`, `assignee`, `search` |
 | `POST` | `/api/tasks` | Membuat tugas baru | JSON Body (`title`, `description`, `status`, `priority`, `due_date`, `assignee`) |
 | `GET` | `/api/tasks/{id}` | Mengambil detail spesifik satu tugas | Path parameter `id` |
-| `PUT` | `/api/tasks/{id}` | Memperbarui seluruh data tugas | Path `id`, JSON Body lengkap |
-| `PATCH` | `/api/tasks/{id}` | Memperbarui sebagian field tugas | Path `id`, JSON Body parsial |
+| `PUT` | `/api/tasks/{id}` | Memperbarui data tugas | Path `id`, JSON Body |
 | `DELETE` | `/api/tasks/{id}` | Menghapus tugas | Path parameter `id` |
 
 ---
@@ -152,6 +174,9 @@ Prefix rute API: `/api/tasks`
 ```text
 hmsi/
 ├── backend/
+│   ├── alembic/          # Direktori migrasi database Alembic
+│   │   ├── versions/     # File revisi migrasi skema (001_create_tasks_table)
+│   │   └── env.py        # Konfigurasi koneksi SQLAlchemy & runtime Alembic
 │   ├── app/
 │   │   ├── api/          # Route definitions & endpoints
 │   │   ├── core/         # Konfigurasi aplikasi & database connection
@@ -160,8 +185,11 @@ hmsi/
 │   │   ├── service/      # Layer data access (CRUD operations)
 │   │   └── main.py       # FastAPI application entry point & CORS
 │   ├── tests/            # Test suite Pytest & Fixtures
+│   ├── alembic.ini       # Konfigurasi lokal Alembic backend
+│   ├── seed.py           # Script python dummy data seeding
+│   ├── seed.sql          # Script SQL murni dummy data seeding
 │   ├── .env.example      # Template konfigurasi backend
-│   └── requirements.txt  # Daftar paket Python
+│   └── requirements.txt  # Daftar paket Python (+ Alembic)
 ├── frontend/
 │   ├── src/
 │   │   ├── app/          # App router layout & main page
@@ -171,9 +199,11 @@ hmsi/
 │   │   ├── services/     # Centralized HTTP API client
 │   │   ├── tests/        # Vitest UI component tests
 │   │   └── types/        # TypeScript type definitions
+│   ├── next.config.ts    # Next.js config
 │   ├── .env.local        # Konfigurasi environment Next.js
 │   ├── package.json      # Dependensi dan script frontend
 │   └── README.md         # Dokumentasi khusus frontend
+├── alembic.ini           # Konfigurasi root Alembic
 ├── PRD.md                # Product Requirements Document
 └── README.md             # Dokumentasi utama proyek
 ```
