@@ -1,16 +1,17 @@
 from typing import Optional
+
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 
 from backend.app.api.deps import get_db
-from backend.app.service.tasks import task_service as crud_task
 from backend.app.schemas.task import (
     TaskCreate,
-    TaskUpdate,
-    TaskResponse,
     TaskListResponse,
+    TaskResponse,
     TaskSummaryResponse,
+    TaskUpdate,
 )
+from backend.app.service.tasks import task_service as crud_task
 
 router = APIRouter()
 
