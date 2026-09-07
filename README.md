@@ -2,7 +2,14 @@
 
 Aplikasi manajemen tugas (*Task Management System*) fullstack modern yang dibangun menggunakan **FastAPI (Python)** dan **PostgreSQL** di sisi backend, serta **Next.js 16 (React 19)** dan **Tailwind CSS** di sisi frontend.
 
+![Pratinjau Antarmuka Aplikasi Dasbor](docs/screenshots/dashboard.png)
+
+> 📋 **Status Pemenuhan Persyaratan Teknis:**  
+> Rincian lengkap pemetaan spesifikasi teknis (*Practical Test Case Study*), fitur yang telah selesai (*complete*), serta fitur opsional (*incomplete*) dapat dilihat di dokumen **[FEATURE_CHECKLIST.md](FEATURE_CHECKLIST.md)**.
+
 ---
+
+
 
 ## 🛠️ Fullstack Tech Stack
 
@@ -152,6 +159,8 @@ alembic revision --autogenerate -m "nama_perubahan"
 | **Modal Konfirmasi Hapus** | Dialog peringatan konfirmasi sebelum tugas dihapus secara permanen |
 | **Sistem Toast** | Notifikasi pop-up feedback otomatis untuk setiap aksi Create, Update, dan Delete |
 
+> 💡 *Daftar perbandingan lengkap antara seluruh poin spesifikasi teknis dan status pemenuhannya (Complete vs Incomplete) dapat dilihat di dokumen **[FEATURE_CHECKLIST.md](FEATURE_CHECKLIST.md)**.*
+
 ---
 
 ## 📚 Ringkasan REST API Endpoint
@@ -205,7 +214,9 @@ hmsi/
 │   ├── .env.local        # Konfigurasi environment Next.js
 │   ├── package.json      # Dependensi dan script frontend
 │   └── README.md         # Dokumentasi khusus frontend
+├── docs/                 # Dokumentasi & aset gambar
+│   └── screenshots/      # Tangkapan layar antarmuka aplikasi
 ├── alembic.ini           # Konfigurasi root Alembic
-├── PRD.md                # Product Requirements Document
+├── FEATURE_CHECKLIST.md  # Pemetaan & status pemenuhan fitur (Complete vs Incomplete)
 └── README.md             # Dokumentasi utama proyek
 ```
