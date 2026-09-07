@@ -1,118 +1,132 @@
-# Task Management System - Technical Test HMSI
+# Task Management System - Fullstack (Technical Test HMSI)
 
-Sistem manajemen tugas (*Task Management System*) berbasis REST API yang dibangun menggunakan **FastAPI**, **SQLAlchemy ORM**, dan basis data **PostgreSQL**.
+Aplikasi manajemen tugas (*Task Management System*) fullstack modern yang dibangun menggunakan **FastAPI (Python)** dan **PostgreSQL** di sisi backend, serta **Next.js 16 (React 19)** dan **Tailwind CSS** di sisi frontend.
 
 ---
 
-## 🛠️ Tech Stack
+## 🛠️ Fullstack Tech Stack
 
+### Backend
 - **Framework**: [FastAPI](https://fastapi.tiangolo.com/) (Python 3.10+)
 - **Server**: [Uvicorn](https://www.uvicorn.org/) ASGI
 - **ORM & Database**: [SQLAlchemy 2.0](https://www.sqlalchemy.org/) & [PostgreSQL](https://www.postgresql.org/)
-- **Data Validation**: [Pydantic v2](https://docs.pydantic.dev/) & [pydantic-settings](https://docs.pydantic.dev/latest/concepts/pydantic_settings/)
-- **Testing**: [Pytest](https://docs.pytest.org/) & HTTPX (menggunakan in-memory SQLite fixtures)
+- **Data Validation**: [Pydantic v2](https://docs.pydantic.dev/) & [pydantic-settings](https://docs.pydantic.dev/)
+- **Testing**: [Pytest](https://docs.pytest.org/) & HTTPX (SQLite in-memory)
+
+### Frontend
+- **Framework**: [Next.js 16 (App Router)](https://nextjs.org/) + [React 19](https://react.dev/)
+- **Styling**: [Tailwind CSS v4](https://tailwindcss.com/)
+- **Icons**: [Lucide React](https://lucide.dev/)
+- **Bahasa**: [TypeScript 5](https://www.typescriptlang.org/)
+- **Testing**: [Vitest](https://vitest.dev/) & [React Testing Library](https://testing-library.com/)
 
 ---
 
-## 📋 Prasyarat
+## 📋 Prasyarat Perangkat
 
-Pastikan perangkat Anda telah terpasang:
-- **Python** (versi 3.10 atau lebih baru)
-- **PostgreSQL Server** (versi 14 atau lebih baru) yang sedang berjalan
+- **Python** (versi 3.10+)
+- **Node.js** (versi 18+ / 20+) & **npm**
+- **PostgreSQL Server** (versi 14+) yang sedang aktif
 - **Git**
 
 ---
 
-## 🚀 Panduan Instalasi & Menjalankan
+## 🚀 Panduan Memulai Cepat (Quickstart)
 
-### 1. Buat & Aktifkan Virtual Environment
+### Bagian 1: Menjalankan Backend (FastAPI)
 
-Buka terminal di direktori root project (`hmsi/`):
+1. **Aktifkan Virtual Environment**:
+   - Windows PowerShell:
+     ```powershell
+     python -m venv .venv
+     .\.venv\Scripts\Activate.ps1
+     ```
+   - Linux / macOS:
+     ```bash
+     python3 -m venv .venv
+     source .venv/bin/activate
+     ```
 
-**Windows (PowerShell):**
-```powershell
-python -m venv .venv
-.\.venv\Scripts\Activate.ps1
-```
+2. **Pasang Dependensi Backend**:
+   ```bash
+   pip install -r backend/requirements.txt
+   ```
 
-*Jika muncul error execution policy di PowerShell, jalankan sekali: `Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass`*
+3. **Konfigurasi File Environment Backend (`backend/.env`)**:
+   Salin `backend/.env.example` ke `backend/.env` dan sesuaikan kredensial PostgreSQL Anda:
+   ```env
+   PROJECT_NAME="Task Management API"
+   API_V1_STR="/api"
+   DATABASE_URL="postgresql://postgres:postgres@localhost:5432/task_management"
+   CORS_ORIGINS="http://localhost:3000,http://127.0.0.1:3000"
+   ```
+   > **Catatan**: Pastikan database `task_management` sudah dibuat di PostgreSQL Anda. Tabel dan tipe enum akan dibuat secara otomatis saat backend pertama kali dijalankan.
 
-**Windows (Command Prompt):**
-```cmd
-python -m venv .venv
-.\.venv\Scripts\activate.bat
-```
-
-**Linux / macOS:**
-```bash
-python3 -m venv .venv
-source .venv/bin/activate
-```
-
----
-
-### 2. Pasang Dependensi
-
-Pastikan virtual environment telah aktif, lalu pasang paket dependensi:
-```bash
-pip install -r backend/requirements.txt
-```
-
----
-
-### 3. Konfigurasi Environment Variables (`.env`)
-
-Salin template file `.env.example` yang ada di direktori `backend/` menjadi `.env`:
-
-**Windows (PowerShell):**
-```powershell
-Copy-Item backend\.env.example backend\.env
-```
-
-**Linux / macOS:**
-```bash
-cp backend/.env.example backend/.env
-```
-
-Buka file `backend/.env` dan sesuaikan kredensial PostgreSQL Anda:
-```env
-PROJECT_NAME="Task Management API"
-API_V1_STR="/api"
-
-# Format: postgresql://<username>:<password>@<host>:<port>/<nama_database>
-DATABASE_URL="postgresql://postgres:postgres@localhost:5432/task_management"
-
-CORS_ORIGINS="http://localhost:3000,http://127.0.0.1:3000"
-```
-
-> **Catatan Penting Database:**
-> Buat database baru bernama `task_management` di PostgreSQL (misal via pgAdmin, DBeaver, atau psql: `CREATE DATABASE task_management;`).
-> Skema tabel dan tipe enumerasi akan otomatis dibuatkan oleh SQLAlchemy saat aplikasi FastAPI pertama kali dijalankan (`Base.metadata.create_all`).
+4. **Jalankan Server Backend**:
+   ```bash
+   uvicorn backend.app.main:app --reload --port 8000
+   ```
+   - Swagger Interactive API Docs: [http://localhost:8000/docs](http://localhost:8000/docs)
+   - Health Check: [http://localhost:8000/](http://localhost:8000/)
 
 ---
 
-### 4. Menjalankan Server Backend
+### Bagian 2: Menjalankan Frontend (Next.js)
 
-Jalankan server pengembangan dengan perintah berikut dari direktori root:
+1. **Buka Terminal Baru**, lalu masuk ke direktori `frontend/`:
+   ```bash
+   cd frontend
+   ```
 
-```bash
-uvicorn backend.app.main:app --reload --port 8000
-```
+2. **Pasang Dependensi Frontend**:
+   ```bash
+   npm install
+   ```
 
-Server akan aktif di:
-- **Base URL / Health Check**: [http://localhost:8000/](http://localhost:8000/)
-- **Interactive API Docs (Swagger UI)**: [http://localhost:8000/docs](http://localhost:8000/docs)
-- **Alternative Docs (ReDoc)**: [http://localhost:8000/redoc](http://localhost:8000/redoc)
+3. **Konfigurasi Environment Variable (`frontend/.env.local`)**:
+   ```env
+   NEXT_PUBLIC_API_BASE_URL=http://localhost:8000/api
+   ```
+
+4. **Jalankan Development Server Frontend**:
+   ```bash
+   npm run dev
+   ```
+   Aplikasi dapat diakses langsung melalui browser di:
+   👉 **[http://localhost:3000](http://localhost:3000)**
 
 ---
 
 ## 🧪 Menjalankan Automated Tests
 
-Test suite dijalankan secara terisolasi menggunakan SQLite in-memory, sehingga Anda dapat menjalankannya kapan saja tanpa mempengaruhi database PostgreSQL asli:
-
+### 1. Test Backend (Pytest)
+Dijalankan secara terisolasi menggunakan SQLite in-memory:
 ```bash
 pytest backend/tests -v
 ```
+
+### 2. Test Frontend (Vitest & Testing Library)
+Menguji validasi form, penolakan tanggal lampau, dan penanganan pengiriman:
+```bash
+cd frontend
+npm test
+```
+
+---
+
+## 🌟 Fitur Unggulan Sistem
+
+| Fitur | Deskripsi |
+| :--- | :--- |
+| **Dashboard Metrik** | Agregasi real-time untuk Total Tasks, To Do, In Progress, Done, dan Overdue |
+| **Bilah Progres** | Visualisasi persentase penyelesaian tugas secara proporsional |
+| **Dual View Mode** | Toggle fleksibel antara **Tampilan Tabel** dan **Tampilan Kartu/Grid** |
+| **Pencarian & Filter** | Debounced search judul tugas, filter status, filter prioritas, dan filter penanggung jawab |
+| **Paginasi Responsif** | Pengaturan nomor halaman, tombol next/prev, dan pemilih limit baris per halaman |
+| **Form Validasi Lengkap** | Validasi sisi klien, mapping error backend (422), dan proteksi anti-double-submission |
+| **Aksi Status Cepat** | Pembaruan status (misal: "Mulai Kerjakan", "Tandai Selesai") dengan 1-klik |
+| **Modal Konfirmasi Hapus** | Dialog peringatan konfirmasi sebelum tugas dihapus secara permanen |
+| **Sistem Toast** | Notifikasi pop-up feedback otomatis untuk setiap aksi Create, Update, dan Delete |
 
 ---
 
@@ -133,34 +147,33 @@ Prefix rute API: `/api/tasks`
 
 ---
 
-## 📁 Struktur Direktori
+## 📁 Struktur Direktori Repositori
 
 ```text
 hmsi/
 ├── backend/
 │   ├── app/
-│   │   ├── api/          # Route definitions & dependency injection
-│   │   ├── core/         # Konfigurasi app & koneksi database
+│   │   ├── api/          # Route definitions & endpoints
+│   │   ├── core/         # Konfigurasi aplikasi & database connection
 │   │   ├── models/       # Model SQLAlchemy ORM
 │   │   ├── schemas/      # Schema validasi Pydantic v2
-│   │   ├── service/      # Layer query data access (CRUD)
-│   │   └── main.py       # Entry point FastAPI & Middleware
+│   │   ├── service/      # Layer data access (CRUD operations)
+│   │   └── main.py       # FastAPI application entry point & CORS
 │   ├── tests/            # Test suite Pytest & Fixtures
-│   ├── .env.example      # Template konfigurasi
-│   ├── .env              # Konfigurasi aktif (diabaikan git)
-│   └── requirements.txt  # Daftar dependensi backend
-├── .gitignore            # Filter file yang diabaikan Git
-├── pyrightconfig.json    # Konfigurasi Python Language Server
-└── README.md             # Panduan dokumentasi proyek
+│   ├── .env.example      # Template konfigurasi backend
+│   └── requirements.txt  # Daftar paket Python
+├── frontend/
+│   ├── src/
+│   │   ├── app/          # App router layout & main page
+│   │   ├── components/   # UI components (dashboard, tasks, modals, badges)
+│   │   ├── hooks/        # Custom React hooks (useTasks)
+│   │   ├── lib/          # Helper utilities (date formatting, overdue)
+│   │   ├── services/     # Centralized HTTP API client
+│   │   ├── tests/        # Vitest UI component tests
+│   │   └── types/        # TypeScript type definitions
+│   ├── .env.local        # Konfigurasi environment Next.js
+│   ├── package.json      # Dependensi dan script frontend
+│   └── README.md         # Dokumentasi khusus frontend
+├── PRD.md                # Product Requirements Document
+└── README.md             # Dokumentasi utama proyek
 ```
-
----
-
-## 🔧 Troubleshooting Umum
-
-1. **Error `Cannot find module sqlalchemy` di VS Code:**
-   - Tekan `Ctrl + Shift + P` -> pilih **Python: Select Interpreter** -> pilih `.venv` (`.\.venv\Scripts\python.exe`).
-2. **Error `FATAL: password authentication failed for user "postgres"`:**
-   - Periksa kembali file `backend/.env`. Sesuaikan `<username>` dan `<password>` dengan user PostgreSQL yang ada di komputer Anda.
-3. **Error `database "task_management" does not exist`:**
-   - Buat database `task_management` terlebih dahulu di PostgreSQL sebelum menjalankan server.
