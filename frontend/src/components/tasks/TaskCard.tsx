@@ -32,11 +32,13 @@ export function TaskCard({
 
   return (
     <div
-      className={`group relative flex flex-col justify-between p-5 rounded-2xl border bg-white shadow-xs hover:shadow-md transition-all duration-200 ${
+      onClick={() => onView(task)}
+      className={`group relative flex flex-col justify-between p-5 rounded-2xl border bg-white shadow-xs hover:shadow-md transition-all duration-200 cursor-pointer ${
         overdue
-          ? "border-rose-200 bg-rose-50/20"
+          ? "border-rose-200 bg-rose-50/20 hover:border-rose-300"
           : "border-slate-200 hover:border-slate-300"
       }`}
+      title="Klik untuk melihat rincian tugas"
     >
       <div>
         {/* Badges row */}
@@ -50,11 +52,7 @@ export function TaskCard({
         </div>
 
         {/* Title */}
-        <h4
-          onClick={() => onView(task)}
-          className="text-base font-bold text-slate-900 group-hover:text-indigo-600 cursor-pointer transition-colors line-clamp-2 mb-1.5"
-          title={task.title}
-        >
+        <h4 className="text-base font-bold text-slate-900 group-hover:text-indigo-600 transition-colors line-clamp-2 mb-1.5">
           {task.title}
         </h4>
 
@@ -88,12 +86,19 @@ export function TaskCard({
         </div>
 
         {/* Action Buttons Row */}
-        <div className="flex items-center justify-between gap-1 pt-1">
+        <div
+          className="flex items-center justify-between gap-1 pt-1"
+          onClick={(e) => e.stopPropagation()}
+        >
           {/* Quick status transition */}
           <div className="flex items-center gap-1">
             {task.status !== "Done" && (
               <button
-                onClick={() => onQuickStatusChange(task, "Done")}
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onQuickStatusChange(task, "Done");
+                }}
                 className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded-lg text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200/60 transition-colors"
                 title="Tandai Selesai"
               >
@@ -103,7 +108,11 @@ export function TaskCard({
             )}
             {task.status === "To Do" && (
               <button
-                onClick={() => onQuickStatusChange(task, "In Progress")}
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onQuickStatusChange(task, "In Progress");
+                }}
                 className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded-lg text-amber-700 bg-amber-50 hover:bg-amber-100 border border-amber-200/60 transition-colors"
                 title="Mulai Kerjakan"
               >
@@ -113,7 +122,11 @@ export function TaskCard({
             )}
             {task.status === "Done" && (
               <button
-                onClick={() => onQuickStatusChange(task, "In Progress")}
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onQuickStatusChange(task, "In Progress");
+                }}
                 className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded-lg text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-200 transition-colors"
                 title="Buka Kembali"
               >
@@ -126,21 +139,33 @@ export function TaskCard({
           {/* Standard buttons: View, Edit, Delete */}
           <div className="flex items-center gap-0.5">
             <button
-              onClick={() => onView(task)}
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                onView(task);
+              }}
               className="p-1.5 rounded-lg text-slate-400 hover:text-slate-800 hover:bg-slate-100 transition-colors"
               aria-label="Lihat detail tugas"
             >
               <Eye className="w-4 h-4" />
             </button>
             <button
-              onClick={() => onEdit(task)}
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                onEdit(task);
+              }}
               className="p-1.5 rounded-lg text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 transition-colors"
               aria-label="Edit tugas"
             >
               <Edit2 className="w-4 h-4" />
             </button>
             <button
-              onClick={() => onDelete(task)}
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                onDelete(task);
+              }}
               className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors"
               aria-label="Hapus tugas"
             >

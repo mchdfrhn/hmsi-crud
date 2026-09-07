@@ -14,7 +14,7 @@ import { TaskDetailModal } from "@/components/tasks/TaskDetailModal";
 import { DeleteConfirmModal } from "@/components/tasks/DeleteConfirmModal";
 import { SummaryCardSkeleton, TableRowSkeleton, GridCardSkeleton } from "@/components/ui/Skeleton";
 import { EmptyState } from "@/components/ui/EmptyState";
-import { CheckSquare, RefreshCw, AlertCircle, Sparkles } from "lucide-react";
+import { ExternalLink, RefreshCw, AlertCircle } from "lucide-react";
 
 export default function HomePage() {
   const {
@@ -28,6 +28,8 @@ export default function HomePage() {
     priority,
     assignee,
     search,
+    isOverdueFilter,
+    sortBy,
     isLoading,
     isSummaryLoading,
     error,
@@ -37,6 +39,9 @@ export default function HomePage() {
     setPriority,
     setAssignee,
     setSearch,
+    setSortBy,
+    toggleStatusFilter,
+    toggleOverdueFilter,
     resetFilters,
     refreshTasks,
     refreshSummary,
@@ -92,50 +97,82 @@ export default function HomePage() {
     Boolean(search) ||
     (status && status !== "All") ||
     (priority && priority !== "All") ||
-    Boolean(assignee);
+    Boolean(assignee) ||
+    isOverdueFilter;
 
   return (
     <div className="min-h-screen bg-[#f8fafc] text-slate-900 flex flex-col">
       {/* Top Navigation Bar */}
-      <header className="sticky top-0 z-30 border-b border-slate-200/80 bg-white/95 backdrop-blur-sm shadow-xs">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-indigo-600 text-white flex items-center justify-center shadow-sm shadow-indigo-600/20">
-              <CheckSquare className="w-5 h-5" />
-            </div>
-            <div>
+      <header className="sticky top-0 z-30 border-b border-slate-200/80 bg-white/95 backdrop-blur-md">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between">
+          {/* Brand & Breadcrumbs */}
+          <div className="flex items-center gap-6">
+            <div className="flex items-center gap-2.5">
+              <div className="w-7 h-7 rounded-lg bg-slate-900 text-white flex items-center justify-center font-bold text-xs shadow-xs tracking-tight">
+                iT
+              </div>
               <div className="flex items-center gap-2">
-                <h1 className="text-base font-bold text-slate-900 leading-none tracking-tight">
-                  Antigravity Tasks
-                </h1>
-                <span className="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-indigo-50 text-indigo-700 border border-indigo-100 text-[10px] font-semibold">
-                  <Sparkles className="w-2.5 h-2.5" /> Pro
+                <span className="text-sm font-semibold text-slate-900 tracking-tight">
+                  iTasks
+                </span>
+                <span className="text-slate-300 font-light">/</span>
+                <span className="text-xs font-medium text-slate-500">
+                  Workspace
                 </span>
               </div>
-              <span className="text-xs text-slate-500 font-medium">
-                Task Management System &bull; HMSI Technical Test
-              </span>
             </div>
+
+            {/* Navigation Tabs */}
+            <nav className="hidden md:flex items-center gap-1 border-l border-slate-200 pl-4">
+              <span className="px-2.5 py-1 text-xs font-semibold text-slate-900 bg-slate-100 rounded-md">
+                Tasks
+              </span>
+              <a
+                href="http://localhost:8000/docs"
+                target="_blank"
+                rel="noreferrer"
+                className="flex items-center gap-1 px-2.5 py-1 text-xs font-medium text-slate-500 hover:text-slate-900 rounded-md hover:bg-slate-50 transition-colors"
+                title="Buka Dokumentasi Swagger API"
+              >
+                <span>API Docs</span>
+                <ExternalLink className="w-3 h-3 text-slate-400" />
+              </a>
+            </nav>
           </div>
 
+          {/* Right: Sync Status & User Profile */}
           <div className="flex items-center gap-3">
-            {/* Backend Status Indicator */}
-            <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-50 border border-emerald-200/70 text-emerald-700 text-xs font-medium">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              <span>FastAPI Backend Active</span>
-            </div>
-
-            {/* Refresh Button */}
+            {/* Real-time sync status indicator */}
             <button
               onClick={() => {
                 refreshTasks();
                 refreshSummary();
               }}
-              className="p-2 rounded-xl border border-slate-200 text-slate-600 hover:text-slate-900 hover:bg-slate-50 hover:border-slate-300 transition-all shadow-xs"
-              title="Perbarui Data"
+              className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium text-slate-600 hover:text-slate-900 rounded-lg hover:bg-slate-100 border border-slate-200/80 transition-colors shadow-xs"
+              title="Klik untuk menyinkronkan data"
             >
-              <RefreshCw className={`w-4 h-4 ${isLoading ? "animate-spin text-indigo-600" : ""}`} />
+              <span
+                className={`w-1.5 h-1.5 rounded-full ${
+                  isLoading ? "bg-amber-500 animate-ping" : "bg-emerald-500"
+                }`}
+              />
+              <span className="hidden sm:inline">
+                {isLoading ? "Syncing..." : "Synced"}
+              </span>
+              <RefreshCw
+                className={`w-3 h-3 text-slate-400 ml-0.5 ${
+                  isLoading ? "animate-spin text-slate-600" : ""
+                }`}
+              />
             </button>
+
+            {/* User Avatar */}
+            <div
+              className="w-7 h-7 rounded-full bg-slate-900 text-white flex items-center justify-center text-[11px] font-semibold shadow-xs cursor-default"
+              title="User Profile"
+            >
+              U
+            </div>
           </div>
         </div>
       </header>
@@ -161,8 +198,10 @@ export default function HomePage() {
             <>
               <SummaryCards
                 summary={summary}
-                onSelectStatusFilter={(s) => setStatus(s)}
+                onSelectStatusFilter={toggleStatusFilter}
+                onToggleOverdueFilter={toggleOverdueFilter}
                 activeStatusFilter={status}
+                isOverdueActive={isOverdueFilter}
               />
               <ProgressBar summary={summary} />
             </>
@@ -197,6 +236,10 @@ export default function HomePage() {
             onViewModeChange={setViewMode}
             onOpenCreateModal={handleOpenCreateModal}
             totalTasks={total}
+            isOverdueFilter={isOverdueFilter}
+            onToggleOverdueFilter={toggleOverdueFilter}
+            sortBy={sortBy}
+            onSortByChange={setSortBy}
           />
 
           {/* Error Banner */}
@@ -270,9 +313,9 @@ export default function HomePage() {
         </section>
       </main>
 
-      {/* Clean White Footer */}
-      <footer className="border-t border-slate-200 bg-white py-6 text-center text-xs text-slate-500">
-        Task Management System &bull; Technical Test HMSI &bull; Next.js 16 + FastAPI
+      {/* Clean Minimalist Footer */}
+      <footer className="border-t border-slate-200/80 bg-white py-5 text-center text-xs text-slate-400">
+        &copy; {new Date().getFullYear()} iTasks &bull; Workspace Task Management
       </footer>
 
       {/* Modals */}

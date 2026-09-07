@@ -5,7 +5,6 @@ import {
   Task,
   TaskCreate,
   TaskListResponse,
-  TaskPriority,
   TaskQueryParams,
   TaskStatus,
   TaskSummaryResponse,
@@ -29,8 +28,12 @@ export function useTasks() {
   const [status, setStatus] = useState<string>("All");
   const [priority, setPriority] = useState<string>("All");
   const [assignee, setAssignee] = useState<string>("");
+  const [debouncedAssignee, setDebouncedAssignee] = useState<string>("");
   const [search, setSearch] = useState<string>("");
   const [debouncedSearch, setDebouncedSearch] = useState<string>("");
+  const [isOverdueFilter, setIsOverdueFilter] = useState<boolean>(false);
+  const [sortBy, setSortBy] = useState<string>("created_at");
+  const [sortOrder, setSortOrder] = useState<string>("desc");
 
   // Loading and error states
   const [isLoading, setIsLoading] = useState(true);
@@ -45,7 +48,7 @@ export function useTasks() {
     }
     searchTimeoutRef.current = setTimeout(() => {
       setDebouncedSearch(search);
-      setPage(1); // Reset to page 1 on new search
+      setPage(1);
     }, 300);
 
     return () => {
@@ -54,6 +57,24 @@ export function useTasks() {
       }
     };
   }, [search]);
+
+  // Debounce assignee input by 300ms to prevent request spamming
+  const assigneeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  useEffect(() => {
+    if (assigneeTimeoutRef.current) {
+      clearTimeout(assigneeTimeoutRef.current);
+    }
+    assigneeTimeoutRef.current = setTimeout(() => {
+      setDebouncedAssignee(assignee);
+      setPage(1);
+    }, 300);
+
+    return () => {
+      if (assigneeTimeoutRef.current) {
+        clearTimeout(assigneeTimeoutRef.current);
+      }
+    };
+  }, [assignee]);
 
   // Fetch summary
   const fetchSummary = useCallback(async () => {
@@ -79,8 +100,11 @@ export function useTasks() {
         limit,
         status: status !== "All" ? status : undefined,
         priority: priority !== "All" ? priority : undefined,
-        assignee: assignee.trim() || undefined,
+        assignee: debouncedAssignee.trim() || undefined,
         search: debouncedSearch.trim() || undefined,
+        is_overdue: isOverdueFilter ? true : undefined,
+        sort_by: sortBy,
+        sort_order: sortOrder,
       };
 
       const response: TaskListResponse = await taskApi.getTasks(params);
@@ -93,7 +117,7 @@ export function useTasks() {
     } finally {
       setIsLoading(false);
     }
-  }, [page, limit, status, priority, assignee, debouncedSearch]);
+  }, [page, limit, status, priority, debouncedAssignee, debouncedSearch, isOverdueFilter, sortBy, sortOrder]);
 
   // Trigger fetch when parameters change
   useEffect(() => {
@@ -137,7 +161,6 @@ export function useTasks() {
     try {
       await taskApi.deleteTask(task.id);
       showToast(`Tugas "${task.title}" berhasil dihapus.`, "info");
-      // Adjust page if current page became empty
       if (tasks.length === 1 && page > 1) {
         setPage((prev) => prev - 1);
       } else {
@@ -151,12 +174,35 @@ export function useTasks() {
     }
   };
 
+  const toggleStatusFilter = (newStatus: string) => {
+    if (newStatus === "All" || status === newStatus) {
+      setStatus("All");
+    } else {
+      setStatus(newStatus);
+      setIsOverdueFilter(false);
+    }
+    setPage(1);
+  };
+
+  const toggleOverdueFilter = () => {
+    setIsOverdueFilter((prev) => {
+      const next = !prev;
+      if (next) setStatus("All");
+      return next;
+    });
+    setPage(1);
+  };
+
   const resetFilters = () => {
     setSearch("");
     setDebouncedSearch("");
+    setAssignee("");
+    setDebouncedAssignee("");
     setStatus("All");
     setPriority("All");
-    setAssignee("");
+    setIsOverdueFilter(false);
+    setSortBy("created_at");
+    setSortOrder("desc");
     setPage(1);
   };
 
@@ -171,6 +217,9 @@ export function useTasks() {
     priority,
     assignee,
     search,
+    isOverdueFilter,
+    sortBy,
+    sortOrder,
     isLoading,
     isSummaryLoading,
     error,
@@ -178,6 +227,7 @@ export function useTasks() {
     setLimit,
     setStatus: (s: string) => {
       setStatus(s);
+      setIsOverdueFilter(false);
       setPage(1);
     },
     setPriority: (p: string) => {
@@ -186,9 +236,18 @@ export function useTasks() {
     },
     setAssignee: (a: string) => {
       setAssignee(a);
-      setPage(1);
     },
     setSearch,
+    setSortBy: (sb: string) => {
+      setSortBy(sb);
+      setPage(1);
+    },
+    setSortOrder: (so: string) => {
+      setSortOrder(so);
+      setPage(1);
+    },
+    toggleStatusFilter,
+    toggleOverdueFilter,
     resetFilters,
     refreshTasks: fetchTasks,
     refreshSummary: fetchSummary,

@@ -85,6 +85,9 @@ export const taskApi = {
       if (params.priority && params.priority !== "All") query.append("priority", params.priority);
       if (params.assignee?.trim()) query.append("assignee", params.assignee.trim());
       if (params.search?.trim()) query.append("search", params.search.trim());
+      if (params.is_overdue !== undefined) query.append("is_overdue", params.is_overdue.toString());
+      if (params.sort_by) query.append("sort_by", params.sort_by);
+      if (params.sort_order) query.append("sort_order", params.sort_order);
     }
 
     const queryString = query.toString();

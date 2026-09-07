@@ -1,8 +1,8 @@
 import React from "react";
 import { Task, TaskStatus } from "@/types/task";
-import { StatusBadge, PriorityBadge, OverdueBadge } from "@/components/ui/Badge";
+import { PriorityBadge, OverdueBadge } from "@/components/ui/Badge";
 import { formatDateTime, isOverdue } from "@/lib/dateUtils";
-import { Eye, Edit2, Trash2, User, Calendar, CheckCircle2, PlayCircle, RotateCcw } from "lucide-react";
+import { Eye, Edit2, Trash2, User, Calendar, ChevronDown, Check } from "lucide-react";
 
 interface TaskTableProps {
   tasks: Task[];
@@ -19,6 +19,28 @@ export function TaskTable({
   onDelete,
   onQuickStatusChange,
 }: TaskTableProps) {
+  const [openStatusMenuId, setOpenStatusMenuId] = React.useState<number | null>(null);
+
+  // Close status dropdown when clicking outside
+  React.useEffect(() => {
+    const handleDocumentClick = () => setOpenStatusMenuId(null);
+    document.addEventListener("click", handleDocumentClick);
+    return () => document.removeEventListener("click", handleDocumentClick);
+  }, []);
+
+  const statusOptions: TaskStatus[] = ["To Do", "In Progress", "Done"];
+
+  const getStatusBadgeStyle = (status: TaskStatus) => {
+    switch (status) {
+      case "Done":
+        return "bg-emerald-50 text-emerald-700 border-emerald-200/80 hover:bg-emerald-100";
+      case "In Progress":
+        return "bg-amber-50 text-amber-700 border-amber-200/80 hover:bg-amber-100";
+      default:
+        return "bg-blue-50 text-blue-700 border-blue-200/80 hover:bg-blue-100";
+    }
+  };
+
   return (
     <div className="overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-xs">
       <table className="w-full text-left text-sm border-collapse">
@@ -35,11 +57,14 @@ export function TaskTable({
         <tbody className="divide-y divide-slate-100">
           {tasks.map((task) => {
             const overdue = isOverdue(task.due_date, task.status);
+            const isMenuOpen = openStatusMenuId === task.id;
 
             return (
               <tr
                 key={task.id}
-                className="hover:bg-slate-50/80 transition-colors group"
+                onClick={() => onView(task)}
+                className="hover:bg-slate-50/80 transition-colors group cursor-pointer"
+                title="Klik baris untuk melihat rincian tugas"
               >
                 {/* Title & Description */}
                 <td className="py-3.5 px-4 max-w-xs">
@@ -48,11 +73,7 @@ export function TaskTable({
                       #{task.id}
                     </span>
                     <div>
-                      <div
-                        onClick={() => onView(task)}
-                        className="font-semibold text-slate-900 hover:text-indigo-600 cursor-pointer line-clamp-1 transition-colors"
-                        title={task.title}
-                      >
+                      <div className="font-semibold text-slate-900 group-hover:text-indigo-600 line-clamp-1 transition-colors">
                         {task.title}
                       </div>
                       {task.description && (
@@ -64,9 +85,53 @@ export function TaskTable({
                   </div>
                 </td>
 
-                {/* Status */}
-                <td className="py-3.5 px-4 whitespace-nowrap">
-                  <StatusBadge status={task.status} size="sm" />
+                {/* Interactive Status Selector Dropdown */}
+                <td className="py-3.5 px-4 whitespace-nowrap" onClick={(e) => e.stopPropagation()}>
+                  <div className="relative inline-block text-left">
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setOpenStatusMenuId(isMenuOpen ? null : task.id);
+                      }}
+                      className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold border transition-all ${getStatusBadgeStyle(
+                        task.status
+                      )}`}
+                      title="Klik untuk mengubah status"
+                    >
+                      <span>{task.status}</span>
+                      <ChevronDown className="w-3 h-3 opacity-60" />
+                    </button>
+
+                    {isMenuOpen && (
+                      <div
+                        className="absolute left-0 mt-1.5 w-36 rounded-xl bg-white border border-slate-200 shadow-lg py-1 z-30 animate-in fade-in zoom-in-95 duration-100"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <div className="px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                          Ubah Status
+                        </div>
+                        {statusOptions.map((opt) => (
+                          <button
+                            key={opt}
+                            type="button"
+                            onClick={() => {
+                              onQuickStatusChange(task, opt);
+                              setOpenStatusMenuId(null);
+                            }}
+                            className={`w-full flex items-center justify-between px-3 py-1.5 text-xs font-medium text-left hover:bg-slate-50 transition-colors ${
+                              task.status === opt
+                                ? "text-indigo-600 font-bold bg-indigo-50/50"
+                                : "text-slate-700"
+                            }`}
+                          >
+                            <span>{opt}</span>
+                            {task.status === opt && <Check className="w-3.5 h-3.5" />}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 </td>
 
                 {/* Priority */}
@@ -102,57 +167,38 @@ export function TaskTable({
                 </td>
 
                 {/* Actions */}
-                <td className="py-3.5 px-4 whitespace-nowrap text-right">
+                <td className="py-3.5 px-4 whitespace-nowrap text-right" onClick={(e) => e.stopPropagation()}>
                   <div className="flex items-center justify-end gap-1">
-                    {/* Quick status transition button */}
-                    {task.status !== "Done" && (
-                      <button
-                        onClick={() => onQuickStatusChange(task, "Done")}
-                        className="p-1.5 rounded-lg text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200/60 transition-colors"
-                        title="Tandai Selesai"
-                      >
-                        <CheckCircle2 className="w-3.5 h-3.5" />
-                      </button>
-                    )}
-                    {task.status === "To Do" && (
-                      <button
-                        onClick={() => onQuickStatusChange(task, "In Progress")}
-                        className="p-1.5 rounded-lg text-amber-700 bg-amber-50 hover:bg-amber-100 border border-amber-200/60 transition-colors"
-                        title="Mulai Kerjakan"
-                      >
-                        <PlayCircle className="w-3.5 h-3.5" />
-                      </button>
-                    )}
-                    {task.status === "Done" && (
-                      <button
-                        onClick={() => onQuickStatusChange(task, "In Progress")}
-                        className="p-1.5 rounded-lg text-slate-600 bg-slate-100 hover:bg-slate-200 border border-slate-200 transition-colors"
-                        title="Buka Kembali"
-                      >
-                        <RotateCcw className="w-3.5 h-3.5" />
-                      </button>
-                    )}
-
-                    <div className="h-4 w-px bg-slate-200 mx-1" />
-
                     <button
-                      onClick={() => onView(task)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onView(task);
+                      }}
                       className="p-1.5 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-lg transition-colors"
                       title="Lihat Detail"
+                      aria-label="View task details"
                     >
                       <Eye className="w-4 h-4" />
                     </button>
                     <button
-                      onClick={() => onEdit(task)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onEdit(task);
+                      }}
                       className="p-1.5 text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
                       title="Edit Tugas"
+                      aria-label="Edit task"
                     >
                       <Edit2 className="w-4 h-4" />
                     </button>
                     <button
-                      onClick={() => onDelete(task)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onDelete(task);
+                      }}
                       className="p-1.5 text-slate-500 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
                       title="Hapus Tugas"
+                      aria-label="Delete task"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>

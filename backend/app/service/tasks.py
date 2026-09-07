@@ -21,6 +21,9 @@ class CRUDTask:
         priority: Optional[str] = None,
         assignee: Optional[str] = None,
         search: Optional[str] = None,
+        is_overdue: Optional[bool] = None,
+        sort_by: Optional[str] = "created_at",
+        sort_order: Optional[str] = "desc",
     ) -> Tuple[List[Task], int, int]:
         query = db.query(Task)
 
@@ -36,11 +39,26 @@ class CRUDTask:
         if search:
             query = query.filter(Task.title.ilike(f"%{search}%"))
 
+        if is_overdue is True:
+            now_utc = datetime.now(timezone.utc)
+            query = query.filter(
+                Task.status != TaskStatus.DONE,
+                Task.due_date.isnot(None),
+                Task.due_date < now_utc,
+            )
+
         total = query.count()
         total_pages = math.ceil(total / limit) if total > 0 else 1
 
+        if sort_by == "due_date":
+            order_exp = Task.due_date.asc().nulls_last() if sort_order == "asc" else Task.due_date.desc().nulls_last()
+        elif sort_by == "title":
+            order_exp = Task.title.asc() if sort_order == "asc" else Task.title.desc()
+        else:
+            order_exp = Task.created_at.asc() if sort_order == "asc" else Task.created_at.desc()
+
         offset = (page - 1) * limit
-        items = query.order_by(Task.created_at.desc()).offset(offset).limit(limit).all()
+        items = query.order_by(order_exp).offset(offset).limit(limit).all()
 
         return items, total, total_pages
 

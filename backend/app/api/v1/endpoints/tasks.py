@@ -50,10 +50,13 @@ def read_tasks(
     priority: Optional[str] = Query(None, description="Filter berdasarkan prioritas (Low, Medium, High)"),
     assignee: Optional[str] = Query(None, description="Filter berdasarkan assignee"),
     search: Optional[str] = Query(None, description="Pencarian kata kunci pada judul tugas"),
+    is_overdue: Optional[bool] = Query(None, description="Filter tugas yang melewati batas waktu"),
+    sort_by: Optional[str] = Query("created_at", description="Kolom pengurutan (created_at, due_date, title)"),
+    sort_order: Optional[str] = Query("desc", description="Arah pengurutan (asc, desc)"),
     db: Session = Depends(get_db),
 ):
     """
-    Mengambil daftar tugas dengan dukungan paginasi, pencarian judul, dan filter (status, prioritas, assignee).
+    Mengambil daftar tugas dengan dukungan paginasi, pencarian judul, filter (status, prioritas, assignee, overdue), dan pengurutan.
     """
     items, total, total_pages = crud_task.get_multi(
         db=db,
@@ -63,6 +66,9 @@ def read_tasks(
         priority=priority,
         assignee=assignee,
         search=search,
+        is_overdue=is_overdue,
+        sort_by=sort_by,
+        sort_order=sort_order,
     )
     return TaskListResponse(
         items=items,

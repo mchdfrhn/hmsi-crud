@@ -67,4 +67,8 @@ export interface TaskQueryParams {
   priority?: TaskPriority | string;
   assignee?: string;
   search?: string;
+  is_overdue?: boolean;
+  sort_by?: string;
+  sort_order?: string;
 }
+
