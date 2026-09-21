@@ -1,3 +1,13 @@
+// ==============================================================================
+// HALAMAN UTAMA DASBOR MANAJEMEN TUGAS (app/page.tsx)
+// ==============================================================================
+// File ini bertindak sebagai Container Page / View Orchestrator:
+// 1. Mengonsumsi Custom Hook `useTasks()` untuk mendapatkan state & actions.
+// 2. Mengatur state lokal presentasional: viewMode (tabel vs grid), modal dialogs (create/edit, detail, delete).
+// 3. Merangkai subkomponen modular (SummaryCards, ProgressBar, TaskFilterBar, TaskTable, TaskGrid, Pagination).
+// 4. Menangani feedback loading state (Skeleton loader), empty states, dan error banner.
+// ==============================================================================
+
 "use client";
 
 import React, { useState } from "react";
@@ -17,6 +27,9 @@ import { EmptyState } from "@/components/ui/EmptyState";
 import { ExternalLink, RefreshCw, AlertCircle } from "lucide-react";
 
 export default function HomePage() {
+  // ----------------------------------------------------------------------------
+  // 1. Konsumsi Seluruh State & Aksi dari Custom Hook useTasks
+  // ----------------------------------------------------------------------------
   const {
     tasks,
     summary,
@@ -51,27 +64,34 @@ export default function HomePage() {
     deleteTask,
   } = useTasks();
 
-  // UI view mode: "table" or "grid" (default table)
+  // ----------------------------------------------------------------------------
+  // 2. State Lokal Antarmuka (UI Presentational State)
+  // ----------------------------------------------------------------------------
+  // Mode tampilan: "table" (tabel baris rapat) atau "grid" (kartu visual kanban-like)
   const [viewMode, setViewMode] = useState<"table" | "grid">("table");
 
-  // Modal states
+  // State Modal Form (Create / Edit Task)
   const [isFormModalOpen, setIsFormModalOpen] = useState(false);
   const [taskToEdit, setTaskToEdit] = useState<Task | null>(null);
 
+  // State Modal Detail (Melihat data lengkap & riwayat audit log)
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [taskToView, setTaskToView] = useState<Task | null>(null);
 
+  // State Modal Konfirmasi Hapus
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [taskToDelete, setTaskToDelete] = useState<Task | null>(null);
 
-  // Modal Handlers
+  // ----------------------------------------------------------------------------
+  // 3. Handler Interaksi Modal & Form Submission
+  // ----------------------------------------------------------------------------
   const handleOpenCreateModal = () => {
-    setTaskToEdit(null);
+    setTaskToEdit(null); // Mode Create: taskToEdit dikosongkan
     setIsFormModalOpen(true);
   };
 
   const handleOpenEditModal = (task: Task) => {
-    setTaskToEdit(task);
+    setTaskToEdit(task); // Mode Edit: isi data awal form dengan task terpilih
     setIsFormModalOpen(true);
   };
 
@@ -85,6 +105,7 @@ export default function HomePage() {
     setIsDeleteModalOpen(true);
   };
 
+  // Dispatcher submit form: membedakan create atau update berdasarkan adanya taskToEdit
   const handleFormSubmit = async (data: TaskCreate | TaskUpdate) => {
     if (taskToEdit) {
       await updateTask(taskToEdit.id, data);
@@ -93,12 +114,14 @@ export default function HomePage() {
     }
   };
 
+  // Flag pembantu untuk mendeteksi apakah pengguna sedang memfilter data
   const isFiltered =
     Boolean(search) ||
     (status && status !== "All") ||
     (priority && priority !== "All") ||
     Boolean(assignee) ||
     isOverdueFilter;
+
 
   return (
     <div className="min-h-screen bg-[#f8fafc] text-slate-900 flex flex-col">

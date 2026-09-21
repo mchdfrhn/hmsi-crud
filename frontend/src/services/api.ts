@@ -1,3 +1,14 @@
+// ==============================================================================
+// LAPISAN SERVICE KLIEN HTTP API (services/api.ts)
+// ==============================================================================
+// Mengapa memisahkan pemanggilan fetch() ke dalam satu modul terpusat?
+// 1. Centralized Configuration: Alamat backend (API_BASE_URL) hanya didefinisikan di satu tempat.
+// 2. Uniform Error Handling: Mengubah error HTTP (4xx, 5xx) dan network failure menjadi custom class ApiError.
+// 3. Type Safety: Fungsi memanfaatkan TypeScript Generic `request<T>()` sehingga tipe kembalian
+//    terjamin sesuai dengan interface model.
+// 4. Clean Code: Komponen UI dan hooks tidak perlu tahu seluk-beluk header HTTP atau JSON.stringify().
+// ==============================================================================
+
 import {
   Task,
   TaskAuditLog,
@@ -9,10 +20,15 @@ import {
   ApiValidationErrorDetail,
 } from "@/types/task";
 
-
+// Mengambil URL dasar API dari environment variable Next.js (.env.local),
+// dengan fallback ke localhost:8000/api jika tidak disetel.
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000/api";
 
+/**
+ * Custom Error Class untuk menangani kegagalan HTTP request secara terstruktur.
+ * Menyimpan status code HTTP dan rincian field error validasi dari FastAPI.
+ */
 export class ApiError extends Error {
   status: number;
   errors?: ApiValidationErrorDetail[];
@@ -25,6 +41,10 @@ export class ApiError extends Error {
   }
 }
 
+/**
+ * Fungsi pembungkus (wrapper) generic di atas Fetch API native browser.
+ * Menangani header JSON, parsing respons, dan interceptor error otomatis.
+ */
 async function request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
   const url = `${API_BASE_URL}${endpoint}`;
   const headers = {
@@ -38,9 +58,11 @@ async function request<T>(endpoint: string, options: RequestInit = {}): Promise<
       headers,
     });
 
+    // Periksa apakah server mengembalikan content-type JSON
     const isJson = response.headers.get("content-type")?.includes("application/json");
     const data = isJson ? await response.json() : null;
 
+    // Jika HTTP status bukan 2xx (misal: 400, 404, 422, 500)
     if (!response.ok) {
       let errorMessage = "Terjadi kesalahan pada server.";
       let errors: ApiValidationErrorDetail[] | undefined;
@@ -49,7 +71,7 @@ async function request<T>(endpoint: string, options: RequestInit = {}): Promise<
         if (typeof data.detail === "string") {
           errorMessage = data.detail;
         } else if (Array.isArray(data.detail)) {
-          // FastAPI default validation error format fallback
+          // Fallback format pesan error validasi bawaan FastAPI jika bukan custom handler
           errorMessage = data.detail.map((d: { msg?: string }) => d.msg || "Invalid input").join(", ");
         }
         if (Array.isArray(data.errors)) {
@@ -65,7 +87,7 @@ async function request<T>(endpoint: string, options: RequestInit = {}): Promise<
     if (err instanceof ApiError) {
       throw err;
     }
-    // Network / connection error
+    // Tangani error jaringan / server offline / CORS blocked
     throw new ApiError(
       "Gagal terhubung ke server backend (Pastikan FastAPI aktif di port 8000).",
       0
@@ -73,9 +95,13 @@ async function request<T>(endpoint: string, options: RequestInit = {}): Promise<
   }
 }
 
+/**
+ * Objek taskApi mengumpulkan seluruh method pemanggilan REST API untuk modul Tasks.
+ */
 export const taskApi = {
   /**
-   * Mengambil daftar tugas dengan filter dan paginasi
+   * Mengambil daftar tugas dengan dukungan filter, pagination, dan sorting:
+   * Menggunakan URLSearchParams untuk menyusun query string (?page=1&limit=10&status=To%20Do...)
    */
   async getTasks(params?: TaskQueryParams): Promise<TaskListResponse> {
     const query = new URLSearchParams();
@@ -105,14 +131,14 @@ export const taskApi = {
   },
 
   /**
-   * Mengambil detail tugas berdasarkan ID
+   * Mengambil detail tugas spesifik berdasarkan ID
    */
   async getTaskById(id: number): Promise<Task> {
     return request<Task>(`/tasks/${id}`, { method: "GET" });
   },
 
   /**
-   * Membuat tugas baru
+   * Membuat tugas baru (POST /api/tasks)
    */
   async createTask(data: TaskCreate): Promise<Task> {
     return request<Task>("/tasks", {
@@ -122,7 +148,7 @@ export const taskApi = {
   },
 
   /**
-   * Memperbarui tugas yang sudah ada
+   * Memperbarui data tugas yang sudah ada (PUT /api/tasks/{id})
    */
   async updateTask(id: number, data: TaskUpdate): Promise<Task> {
     return request<Task>(`/tasks/${id}`, {
@@ -132,7 +158,7 @@ export const taskApi = {
   },
 
   /**
-   * Menghapus tugas berdasarkan ID
+   * Menghapus tugas dari sistem (DELETE /api/tasks/{id})
    */
   async deleteTask(id: number): Promise<{ detail: string; id: number }> {
     return request<{ detail: string; id: number }>(`/tasks/${id}`, {
@@ -141,7 +167,7 @@ export const taskApi = {
   },
 
   /**
-   * Mengambil riwayat audit perubahan status tugas
+   * Mengambil riwayat audit log perubahan status suatu tugas (GET /api/tasks/{id}/audit-logs)
    */
   async getTaskAuditLogs(taskId: number): Promise<TaskAuditLog[]> {
     return request<TaskAuditLog[]>(`/tasks/${taskId}/audit-logs`, {
@@ -149,4 +175,5 @@ export const taskApi = {
     });
   },
 };
+
 
