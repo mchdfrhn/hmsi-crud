@@ -83,6 +83,8 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
+# Aturan "lib/" di atas (artefak build Python) tidak berlaku untuk kode sumber frontend
+!frontend/src/lib/
 
 PRD.md
 .vscode/
